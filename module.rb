@@ -7,6 +7,8 @@ class Module
   EXPORT_SECTION_ID = 7
   CODE_SECTION_ID = 10
 
+  attr_reader :func_types
+
   def initialize(path)
     io = ModuleIO.new(File.read(path, mode: "rb"))
     
@@ -41,8 +43,9 @@ class Module
   private
 
     def read_type_section(io)
-      puts "Start type section!"
-      discard_section(io)
+      validate_section_size(io) do
+        @func_types = io.read_vector { FuncType.new(io) }
+      end
     end
 
     def read_function_section(io)
@@ -63,5 +66,14 @@ class Module
     def discard_section(io)
       size = io.read_u32
       io.pos += size
+    end
+
+    def validate_section_size(io)
+      size = io.read_u32
+      expected_end_pos = io.pos + size
+
+      yield size
+
+      raise "Invalid section size" if io.pos != expected_end_pos
     end
 end
