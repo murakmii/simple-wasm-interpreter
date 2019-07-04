@@ -7,7 +7,7 @@ class Module
   EXPORT_SECTION_ID = 7
   CODE_SECTION_ID = 10
 
-  attr_reader :func_types
+  attr_reader :func_types, :functions
 
   def initialize(path)
     io = ModuleIO.new(File.read(path, mode: "rb"))
@@ -49,8 +49,15 @@ class Module
     end
 
     def read_function_section(io)
-      puts "Start function section!"
-      discard_section(io)
+      validate_section_size(io) do
+        @functions = io.read_vector do
+          type_idx = io.read_u32
+          
+          raise "Invalid type index" if type_idx >= @func_types.size
+
+          Function.new(func_types[type_idx])
+        end
+      end
     end
 
     def read_export_section(io)
