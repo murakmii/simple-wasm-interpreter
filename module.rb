@@ -7,7 +7,9 @@ class Module
   EXPORT_SECTION_ID = 7
   CODE_SECTION_ID = 10
 
-  attr_reader :func_types, :functions
+  FUNC_EXPORT_DESC = 0x00
+
+  attr_reader :func_types, :functions, :exported
 
   def initialize(path)
     io = ModuleIO.new(File.read(path, mode: "rb"))
@@ -52,7 +54,7 @@ class Module
       validate_section_size(io) do
         @functions = io.read_vector do
           type_idx = io.read_u32
-          
+
           raise "Invalid type index" if type_idx >= @func_types.size
 
           Function.new(func_types[type_idx])
@@ -61,8 +63,22 @@ class Module
     end
 
     def read_export_section(io)
-      puts "Start export section!"
-      discard_section(io)
+      @exported = Hash.new
+
+      validate_section_size(io) do
+        io.read_vector do
+          name = io.read_utf8
+          raise "Duplicated export name" if @exported.has_key?(name)
+
+          export_desc = io.readbyte
+          raise "Unsupported export desc: #{export_desc}" if export_desc != FUNC_EXPORT_DESC
+
+          func_idx = io.read_u32
+          raise "Invalid function index: #{func_idx}" if func_idx >= @functions.size
+
+          @exported[name] = @functions[func_idx]
+        end
+      end
     end
 
     def read_code_section(io)

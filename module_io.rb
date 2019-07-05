@@ -13,6 +13,10 @@ class ModuleIO < StringIO
     end
   end
 
+  def read_utf8
+    read(read_u32).force_encoding(Encoding::UTF_8)
+  end
+
   private
 
     def read_unsigned_leb128(max_bits)
