@@ -82,8 +82,13 @@ class Module
     end
 
     def read_code_section(io)
-      puts "Start code section!"
-      discard_section(io)
+      validate_section_size(io) do
+        io.read_vector do |func_idx|
+          raise "Invalide code" if func_idx >= @functions.size
+
+          @functions[func_idx].decode_code!(io)
+        end
+      end
     end
 
     def discard_section(io)

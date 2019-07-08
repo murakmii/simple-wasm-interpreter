@@ -13,6 +13,10 @@ class Int
     @bits = bits
   end
 
+  def default_value
+    0
+  end
+
   def ==(int)
     self.class == int.class && bits == int.bits
   end
