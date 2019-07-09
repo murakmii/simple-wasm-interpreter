@@ -42,6 +42,19 @@ class Module
     end
   end
 
+  def invoke(func_name, args)
+    stack = Stack.new
+    stack.push_values(args)
+
+    Instructions.call(self, stack, functions.index {|f| f == exported[func_name] })
+
+    while stack.current_frame do
+      Instructions.execute(self, stack, stack.current_expr.readbyte)
+    end
+
+    stack.to_a
+  end
+
   private
 
     def read_type_section(io)

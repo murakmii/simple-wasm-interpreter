@@ -1,10 +1,17 @@
 class Value
-  attr_reader :value
+  attr_reader :type, :value
 
   # @param [Int] type
-  def initialize(type)
+  # @param [Integer] value
+  def initialize(type, value = nil)
     @type = type
-    @value = @type.default_value
+    @value = value || @type.default_value
+  end
+
+  def assign(other_value)
+    raise "Invalid value" if !other_value.is_a?(Value) || type != other_value.type
+
+    @value = other_value.value
   end
 
   def inspect

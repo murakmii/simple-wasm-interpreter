@@ -16,12 +16,16 @@ class Function
       n = io.read_u32
       val_type = ValueType.decode(io.readbyte)
 
-      @locals.concat(Array.new(n) { Value.new(val_type) })
+      @locals.concat(Array.new(n) { val_type })
     end
     
     @expr = ModuleIO.new(io.read(end_of_code - io.pos))
 
     analyze_blocks!
+  end
+
+  def create_local_variables
+    @locals.map {|val_type| Value.new(val_type) }
   end
 
   def inspect
