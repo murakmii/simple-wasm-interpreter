@@ -8,6 +8,8 @@ class Instructions
         op_local_set(mod, stack)
       when 0x22
         op_local_tee(mod, stack)
+      when 0x41
+        op_i32_const(mod, stack)
       else
         raise "Unsupported opcode: #{opcode}"
       end
@@ -45,6 +47,11 @@ class Instructions
       def op_local_tee(mod, stack)
         local_idx = stack.current_expr.read_u32
         stack.current_frame.reference_local_var(local_idx).assign(stack.peek)
+      end
+
+      def op_i32_const(mod, stack)
+        value = stack.current_expr.read_s32
+        stack.push_values([Value.new(Int.i32, value)])
       end
   end
 end
