@@ -48,11 +48,16 @@ class Module
 
     Instructions.call(self, stack, functions.index {|f| f == exported[func_name] })
 
-    while stack.current_frame do
-      Instructions.execute(self, stack, stack.current_expr.readbyte)
-    end
+    begin
+      while stack.current_frame do
+        Instructions.execute(self, stack, stack.current_expr.readbyte)
+      end
 
-    stack.to_a
+      stack.to_a
+    rescue => e
+      stack_content = stack.to_a
+      raise "Interpretation error! [#{e.class}:#{e.message}] stack:#{stack_content.size}/#{stack_content}"
+    end
   end
 
   private

@@ -23,6 +23,10 @@ class Stack
     @stack.pop
   end
 
+  def peek
+    @stack.last
+  end
+
   # @return [Frame, nil]
   def current_frame
     return nil if @frame_positions.empty?
