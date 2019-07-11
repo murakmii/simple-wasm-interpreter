@@ -5,7 +5,7 @@ class Value
   # @param [Integer] value
   def initialize(type, value = nil)
     @type = type
-    @value = value || @type.default_value
+    @value = @type.uninterpret(value || @type.default_value)
   end
 
   def assign(other_value)

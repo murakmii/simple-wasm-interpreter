@@ -10,6 +10,10 @@ class Instructions
         op_local_tee(mod, stack)
       when 0x41
         op_i32_const(mod, stack)
+      when 0x4F
+        op_i32_ge_u(mod, stack)
+      when 0x6A
+        op_i32_add(mod, stack)
       else
         raise "Unsupported opcode: #{opcode}"
       end
@@ -52,6 +56,20 @@ class Instructions
       def op_i32_const(mod, stack)
         value = stack.current_expr.read_s32
         stack.push_values([Value.new(Int.i32, value)])
+      end
+
+      def op_i32_ge_u(mod, stack)
+        c2 = stack.pop_value(Int.i32)
+        c1 = stack.pop_value(Int.i32)
+
+        stack.push_values([Value.new(Int.i32, c1.value >= c2.value ? 1 : 0)])
+      end
+
+      def op_i32_add(mod, stack)
+        c2 = stack.pop_value(Int.i32)
+        c1 = stack.pop_value(Int.i32)
+
+        stack.push_values([Value.new(Int.i32, c1.value + c2.value)])
       end
   end
 end

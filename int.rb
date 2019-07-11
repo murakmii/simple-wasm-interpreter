@@ -16,6 +16,10 @@ class Int
   def default_value
     0
   end
+  
+  def uninterpret(value)
+    value & (2**bits - 1)
+  end
 
   def ==(int)
     self.class == int.class && bits == int.bits
