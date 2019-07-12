@@ -2,6 +2,7 @@ class Stack
   def initialize
     @stack = []
     @frame_positions = []
+    @label_positions = []
   end
 
   # @param [Array<Value>] values
@@ -14,6 +15,12 @@ class Stack
     @stack.push(frame)
     @frame_positions.push(@stack.size - 1)
     frame.function.expr.rewind
+  end
+
+  # @param [Function::Block]
+  def push_label(label)
+    @stack.push(label)
+    @label_positions.push(@stack.size - 1)
   end
 
   # @param [ValueType] val_type

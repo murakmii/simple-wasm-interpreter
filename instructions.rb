@@ -2,6 +2,10 @@ class Instructions
   class << self
     def execute(mod, stack, opcode)
       case opcode
+      when 0x02, 0x03
+        op_block(mod, stack)
+      when 0x04
+        op_if(mod, stack)
       when 0x20
         op_local_get(mod, stack)
       when 0x21
@@ -36,6 +40,27 @@ class Instructions
 
     private
 
+      def op_block(mod, stack)
+        block_start_pc = stack.current_expr.pos + 1
+
+        label = stack.current_frame.function.blocks[block_start_pc]
+        stack.current_expr.pos = label.start_pc
+
+        stack.push_label(label)
+      end
+
+      def op_if(mod, stack)
+        if stack.pop_value(Int.i32).value == 0
+          block_start_pc = stack.current_expr.pos - 1
+
+          label = stack.current_frame.function.blocks[block_start_pc]
+
+          stack.current_expr.pos = label.end_pc + 1
+        else
+          op_block(mod, stack)
+        end
+      end
+
       def op_local_get(mod, stack)
         local_idx = stack.current_expr.read_u32
         stack.push_values([stack.current_frame.reference_local_var(local_idx).dup])
@@ -45,7 +70,7 @@ class Instructions
         local_idx = stack.current_expr.read_u32
         local_var = stack.current_frame.reference_local_var(local_idx)
 
-        value.assign(stack.pop_value(value.type))
+        local_var.assign(stack.pop_value(local_var.type))
       end
 
       def op_local_tee(mod, stack)
