@@ -6,6 +6,10 @@ class Instructions
         op_block(mod, stack)
       when 0x04
         op_if(mod, stack)
+      when 0x0C
+        op_br(mod, stack)
+      when 0x0D
+        op_br_if(mod, stack)
       when 0x20
         op_local_get(mod, stack)
       when 0x21
@@ -58,6 +62,32 @@ class Instructions
           stack.current_expr.pos = label.end_pc + 1
         else
           op_block(mod, stack)
+        end
+      end
+
+      def op_br(mod, stack)
+        label_idx = stack.current_expr.read_u32
+        raise "Invalid label index" if stack.current_labels < label_idx + 1
+
+        label = stack.label(label_idx)
+        value = label.arity.any? ? stack.pop_value(label.arity.first) : nil
+
+        stack.pop_all_from_label(label_idx)
+        stack.push(value) if value
+
+        stack.current_expr.pos =
+          if label.instr == 0x03 # loop
+            label.start_pc - 2
+          else
+            label.end_pc + 1
+          end
+      end
+
+      def op_br_if(mod, stack)
+        if stack.pop_value(Int.i32).value == 0
+          stack.current_expr.read_u32
+        else
+          op_br(mod, stack)
         end
       end
 

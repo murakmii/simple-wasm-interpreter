@@ -30,8 +30,19 @@ class Stack
     @stack.pop
   end
 
+  # @param [Integer] label_idx
+  def pop_all_from_label(label_idx)
+    @stack.slice!(label_position(label_idx)..-1)
+  end
+
   def peek
     @stack.last
+  end
+
+  # @param [Integer] label_idx
+  # @return [Function::Block]
+  def label(label_idx)
+    @stack[label_position(label_idx)]
   end
 
   # @return [Frame, nil]
@@ -48,7 +59,28 @@ class Stack
     current_frame.function.expr
   end
 
+  # @return [Integer]
+  def current_labels
+    raise "No current frame" if current_frame.nil?
+
+    labels = 0
+
+
+    @label_positions.reverse_each do |label_pos|
+      break if label_pos < @frame_positions.last
+      labels += 1
+    end
+  
+    labels
+  end
+
   def to_a
     @stack
   end
+
+  private
+
+    def label_position(label_idx)
+      @label_positions[-(label_idx + 1)]
+    end
 end
