@@ -33,6 +33,19 @@ class Stack
   # @param [Integer] label_idx
   def pop_all_from_label(label_idx)
     @stack.slice!(label_position(label_idx)..-1)
+    @label_positions.slice!(-(label_idx + 1)..-1)
+  end
+  
+  def pop_last_label
+    raise "No label" if @label_positions.empty?
+
+    @stack.delete_at(@label_positions.pop)
+  end
+
+  def pop_current_frame
+    raise "No frame" if @frame_positions.empty?
+
+    @stack.slice!(@frame_positions.pop..-1)
   end
 
   def peek
@@ -64,7 +77,6 @@ class Stack
     raise "No current frame" if current_frame.nil?
 
     labels = 0
-
 
     @label_positions.reverse_each do |label_pos|
       break if label_pos < @frame_positions.last

@@ -6,6 +6,8 @@ class Instructions
         op_block(mod, stack)
       when 0x04
         op_if(mod, stack)
+      when 0x0B
+        op_end(mod, stack)
       when 0x0C
         op_br(mod, stack)
       when 0x0D
@@ -63,6 +65,23 @@ class Instructions
         else
           op_block(mod, stack)
         end
+      end
+
+      def op_end(mod, stack)
+        if !stack.current_expr.eof?
+          stack.pop_last_label
+          return
+        end
+
+        result_type = stack.current_frame.function.func_type.results.first
+        result = stack.pop_value(result_type)
+
+        if !stack.peek.equal?(stack.current_frame)
+          raise "Stack top is NOT current frame"
+        end
+
+        stack.pop_current_frame
+        stack.push_values([result])
       end
 
       def op_br(mod, stack)
