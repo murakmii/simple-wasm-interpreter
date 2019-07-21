@@ -28,7 +28,7 @@ class ModuleIO < StringIO
         case instr
         when 0x0C, 0x0D # br, br_if
           read_u32
-        when (0x20...0x24) # local.get, local.set, local.tee, global.get, global.set
+        when (0x20...0x24) # local.get ~ global.set
           read_u32
         when 0x41, 0x42 # i32.const, i64.const
           read_s32

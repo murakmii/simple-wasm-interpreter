@@ -29,7 +29,8 @@ class Function
   end
 
   def inspect
-    "#<#{self.class} func_type=#{func_type.inspect} locals=#{@locals.inspect} expr=#{@expr.size}>"
+    "#<#{self.class} func_type=#{func_type.inspect} " \
+    "locals=#{@locals.inspect} expr=#{@expr.size}>"
   end
 
   private

@@ -26,7 +26,8 @@ class Stack
   # @param [ValueType] val_type
   # @return [Value]
   def pop_value(val_type)
-    raise "Stack top is NOT value" if !@stack.last.is_a?(Value) || @stack.last.type != val_type
+    raise "Stack top is NOT value" if !@stack.last.is_a?(Value) || 
+                                      @stack.last.type != val_type
     @stack.pop
   end
 

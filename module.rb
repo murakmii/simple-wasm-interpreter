@@ -46,7 +46,8 @@ class Module
     stack = Stack.new
     stack.push_values(args)
 
-    Instructions.call(self, stack, functions.index {|f| f == exported[func_name] })
+    func_idx = functions.index {|f| f == exported[func_name] }
+    Instructions.call(self, stack, func_idx)
 
     begin
       while stack.current_frame do

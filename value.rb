@@ -9,7 +9,8 @@ class Value
   end
 
   def assign(other_value)
-    raise "Invalid value" if !other_value.is_a?(Value) || type != other_value.type
+    raise "Invalid value" if !other_value.is_a?(Value) || 
+                             type != other_value.type
 
     @value = other_value.value
   end
